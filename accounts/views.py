@@ -31,11 +31,10 @@ class RegisterView(APIView):
                 return Response({'error': 'User not created'},
                                 status=status.HTTP_404_NOT_FOUND)
             user.email = email
-            user.customuser.first_name = firstname
-            user.customuser.phone_number= phonenumber
-            user.customuser.state=state
-            user.customuser.district=district
-            user.customuser.save()
+            user.first_name = firstname
+            user.phone_number= phonenumber
+            user.state=state
+            user.district=district
             user.save()
             user_data = {
                 'msg': 'User created successfuly',
@@ -43,10 +42,10 @@ class RegisterView(APIView):
                     'userid': user.id,
                     # 'username': user.username,
                     'emailid': user.email,
-                    'firstname': user.customuser.first_name,
-                    'phonenumber': user.customuser.phone_number,
-                    'state': user.customuser.state,
-                    'district': user.customuser.district
+                    'firstname': user.first_name,
+                    'phonenumber': user.phone_number,
+                    'state': user.state,
+                    'district': user.district
                 }
             }
             return Response(user_data, status=status.HTTP_200_OK)

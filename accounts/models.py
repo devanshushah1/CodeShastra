@@ -39,7 +39,6 @@ class CustomUser(AbstractUser):
     country = models.CharField(max_length=100, default='India', null=True, blank=True)
     state = models.CharField(max_length=255, null=True, blank=True)
     district = models.CharField(max_length=255, null=True, blank=True)
-    
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
