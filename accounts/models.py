@@ -45,3 +45,28 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
+
+    def __str__(self):
+        return self.email
+
+class Keywords(models.Model):
+    name = models.CharField(max_length=200 , null=True)
+    def __str__(self):
+       return self.name
+
+class Item(models.Model):
+    brand_name = models.CharField(max_length=100, null=True, blank=True)
+    keyword = models.ManyToManyField(Keywords)
+    is_found = models.BooleanField(default=True)
+    is_claimed = models.BooleanField(default=True)
+    posted_by = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
+    Image = models.ImageField(null=True, blank=True)
+    def __str__(self):
+       return self.brand_name
+
+class Claims(models.Model):
+    user = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
+    item = models.ForeignKey(Item, null=True, on_delete=models.SET_NULL)
+    def __str__(self):
+       return self.item
+
