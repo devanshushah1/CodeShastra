@@ -72,6 +72,8 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
 WSGI_APPLICATION = 'codeshashtra.wsgi.application'
 
 
