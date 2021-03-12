@@ -17,9 +17,13 @@ class RegisterView(APIView):
         # username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("emailid")
+        firstname = request.data.get("firstname")
+        phonenumber = request.data.get("phonenumber")
+        state = request.data.get("state")
+        district = request.data.get("district")
         if request.user:
-            if password is None or email is None:
-                return Response({'error': 'Please provide both emailid and password '},
+            if password is None or email is None or firstname is None or phonenumber is None or state is None or district is None:
+                return Response({'error': 'Please provide all the user information'},
                                 status=status.HTTP_400_BAD_REQUEST)
             user = CustomUser.objects.create_user(email=email, password=password)
             user.save()
@@ -27,6 +31,10 @@ class RegisterView(APIView):
                 return Response({'error': 'User not created'},
                                 status=status.HTTP_404_NOT_FOUND)
             user.email = email
+            user.customuser.first_name = firstname
+            user.customuser.phone_number= phonenumber
+            user.customuser.state=state
+            user.customuser.district=district
             user.customuser.save()
             user.save()
             user_data = {
@@ -35,6 +43,10 @@ class RegisterView(APIView):
                     'userid': user.id,
                     # 'username': user.username,
                     'emailid': user.email,
+                    'firstname': user.customuser.first_name,
+                    'phonenumber': user.customuser.phone_number,
+                    'state': user.customuser.state,
+                    'district': user.customuser.district
                 }
             }
             return Response(user_data, status=status.HTTP_200_OK)
