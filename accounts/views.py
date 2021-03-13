@@ -164,7 +164,6 @@ class ItemViewSet(viewsets.ModelViewSet):
         brand_name = request.data.get('brand_name', None)
         category = request.data.get('category', None)
         description = request.data.get('description')
-        is_found = request.data.get('is_found')
         image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
@@ -174,7 +173,6 @@ class ItemViewSet(viewsets.ModelViewSet):
         item.item_name = item_name
         item.brand_name = brand_name
         item.description = description
-        item.is_found = is_found
         item.posted_by=user
         item.Image=image
         item.state=state

@@ -67,7 +67,6 @@ class Item(models.Model):
     brand_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     keyword = models.ManyToManyField(Keywords)
-    is_found = models.BooleanField(default=True)
     is_claimed = models.BooleanField(default=False)
     posted_by = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     Image = models.ImageField(null=True, blank=True)
@@ -86,6 +85,7 @@ class Claims(models.Model):
     description = models.TextField(null=True, blank=True)
     location_description = models.TextField(null=True, blank=True)
     is_accepted = models.BooleanField(default=False)
+    bill = models.ImageField(null=True, blank=True)
     def __str__(self):
        return self.item.item_name
 
