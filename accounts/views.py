@@ -13,13 +13,13 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
 # Create your views here.
-f_url = 'http//localhost:3000'
+f_url = 'http//localhost:3000/'
 
 def EmailVerification(user):
     token  = get_random_string(length=32)
     user.email_verified_hash = token
     user.save()
-    verify_link = f_url + 'email-verify/?token=' + token
+    verify_link = f_url + 'login/?token=' + token
     subject = 'Verify your email.'
     to = user.email
     html_content = render_to_string('accounts/EmailVerification.html', {
