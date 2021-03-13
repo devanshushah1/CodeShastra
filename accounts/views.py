@@ -101,24 +101,3 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 
-class LoginView(APIView):
-    def post(self, request):
-        username = request.data.get("username")
-        password = request.data.get("password")
-        if username is None or password is None:
-            return Response({'error': 'Please provide both username and password'},
-                            status=status.HTTP_400_BAD_REQUEST)
-        user = authenticate(username=username, password=password)
-        if not user:
-            return Response({'error': 'Invalid Credentials'},
-                            status=status.HTTP_404_NOT_FOUND)
-        token = get_tokens_for_user(user)
-        user_data = {
-            'token': token,
-            'user': {
-                'userid': user.id,
-                'username': user.username,
-                'emailid': user.email,
-            }
-        }
-        return Response(user_data, status=status.HTTP_200_OK)
