@@ -203,3 +203,11 @@ class ItemViewSet(viewsets.ModelViewSet):
             item.keyword.add(obj)
         
         return Response({'success':'Created Successfully'}, status=status.HTTP_201_CREATED)
+
+class ClaimView(viewsets.ModelViewSet):
+    model = Claims
+    serializers_class= ClaimSerializer
+    queryset = Claims.objects.all()
+
+
+

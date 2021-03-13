@@ -43,4 +43,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = ('__all__')
 
-    
+class ClaimSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Claims
+        fields = ('__all__')
