@@ -32,7 +32,15 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed('Account disabled, contact admin')
         return super().validate(attrs)
 
+class KeywordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Keywords
+        fields = ('__all__')
+
 class ItemSerializer(serializers.ModelSerializer):
+    keyword = serializers.StringRelatedField(many=True)
     class Meta:
         model = Item
         fields = ('__all__')
+
+    
