@@ -7,7 +7,7 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from .models import *
-from rest_framework import status
+from rest_framework import status, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -101,3 +101,10 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 
+class ItemViewSet(viewsets.ModelViewSet):
+    model = Item
+    serializer_class = ItemSerializer
+    queryset = Item.objects.all()
+
+    # def create(self, request):
+        
