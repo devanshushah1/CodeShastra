@@ -15,6 +15,7 @@ from .serializers import *
 import nltk
 from nltk.corpus import wordnet
 nltk.download('wordnet')
+from PyDictionary import PyDictionary
 
 # Create your views here.
 f_url = 'http//localhost:3000/'
@@ -150,10 +151,12 @@ class ItemViewSet(viewsets.ModelViewSet):
         for kw in keywords:
                 
             obj, created = Keywords.objects.get_or_create(name=kw)
-            s = wordnet.synsets(kw)
+            # s = wordnet.synsets(kw)
             kw_ids.append(obj.id)
-            for a in s[:5]:
-                objx, created = Keywords.objects.get_or_create(name=a.lemmas()[0].name().lower())
+            s = PyDictionary()
+            syn = s.synonym(kw.lower())
+            for a in s[:10]:
+                objx, created = Keywords.objects.get_or_create(name=a.lower())
                 kw_ids.append(objx.id)
         
         for obj in kw_ids:
