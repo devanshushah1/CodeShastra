@@ -87,5 +87,5 @@ class Claims(models.Model):
     location_description = models.TextField(null=True, blank=True)
     is_accepted = models.BooleanField(default=False)
     def __str__(self):
-       return self.item
+       return self.item.item_name
 

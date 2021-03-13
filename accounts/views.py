@@ -17,7 +17,6 @@ import nltk
 from nltk.tag import pos_tag
 from nltk.corpus import wordnet
 from PyDictionary import PyDictionary
-
 # Create your views here.
 f_url = 'http://localhost:3000/'
 
@@ -203,4 +202,36 @@ class ItemViewSet(viewsets.ModelViewSet):
             item.keyword.add(obj)
         
         return Response({'success':'Created Successfully'}, status=status.HTTP_201_CREATED)
+
+def ClaimNotification(user, item):
+    subject = 'Claim for item'
+    to = item.posted_by.email
+    html_content = render_to_string('accounts/ClaimNotification.html', {
+        'user':user.email,
+        'item':item.item_name
+    })
+    message = 'A person has claimed an item found by you. Please verify the details.'
+    send_mail(subject=subject, from_email='djangonotforme@gmail.com', message='abcd', recipient_list=[to],
+              html_message=html_content)
+
+class ClaimView(viewsets.ModelViewSet):
+    model = Claims
+    serializer_class= ClaimSerializer
+    queryset = Claims.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        item = request.data['item']
+        item = Item.objects.get(id=item)
+        ClaimNotification(user, item)
+        response= super().create(request, *args, **kwargs)
+        instance = response.data
+        return Response(instance, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        response = super().update(request, *args, **kwargs)
+        instance = response.data
+        return Response(instance, status=status.HTTP_200_OK)
+
+
 

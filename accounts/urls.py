@@ -4,6 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'items', views.ItemViewSet, basename='ItemViewset')
+router.register(r'claim', views.ClaimView)
 
 urlpatterns = [
     path('register/', views.RegisterView.as_view()),
