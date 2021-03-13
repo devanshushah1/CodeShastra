@@ -127,7 +127,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         # image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
-        keyword = keyword.lower()
+        # keyword = keyword.lower()
         user = request.user
         print(user)
         item = Item()
@@ -148,9 +148,13 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
         kw_ids = []
-
-        keywords = keyword.split(" ")
-        for kw in keywords:                
+        # keywords = keyword.split(" ")
+        is_noun = lambda pos: pos[:2] == 'NN'
+        is_adj = lambda pos: pos[:2] == 'JJ'
+        tokenized = nltk.word_tokenize(description)
+        nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if is_noun(pos)]
+        adjs = [word for (word, pos) in nltk.pos_tag(tokenized) if is_adj(pos)]
+        for kw in nouns:
             obj, created = Keywords.objects.get_or_create(name=kw)
             print(created)
             # s = wordnet.synsets(kw)
@@ -165,7 +169,21 @@ class ItemViewSet(viewsets.ModelViewSet):
                     print(a)
                     objx, created = Keywords.objects.get_or_create(name=a.lower())
                     kw_ids.append(objx.id)
-        
+        for kw in adjs:
+            obj, created = Keywords.objects.get_or_create(name=kw)
+            print(created)
+            # s = wordnet.synsets(kw)
+            kw_ids.append(obj.id)
+            s = PyDictionary()
+            syn = s.synonym(kw.lower())
+            print("syn", syn)
+            print(0)
+            if created:
+                for a in syn[:20]:
+                    print(1)
+                    print(a)
+                    objx, created = Keywords.objects.get_or_create(name=a.lower())
+                    kw_ids.append(objx.id)
         for obj in kw_ids:
             item.keyword.add(obj)
         
