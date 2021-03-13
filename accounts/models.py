@@ -65,6 +65,7 @@ class Item(models.Model):
     item_name = models.CharField(max_length=500, null=True, blank=True)
     category = models.CharField(max_length=50, choices=choices, default='ACCESSORIES')
     brand_name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     keyword = models.ManyToManyField(Keywords)
     is_found = models.BooleanField(default=True)
     is_claimed = models.BooleanField(default=False)
