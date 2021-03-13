@@ -231,6 +231,7 @@ class ClaimView(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         instance = response.data
+        print(instance)
         return Response(instance, status=status.HTTP_200_OK)
 
 
