@@ -12,6 +12,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 # Create your views here.
 f_url = 'http//localhost:3000'
 
@@ -100,4 +102,43 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+class ItemUpload(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        brand_name = request.data.get('brand_name')
+        keyword = request.data.get('keyword')
+        is_found = request.data.get('is_found')
+        is_claimed = request.data.get('is_claimed')
+        posted_by = request.data.get('posted_by')
+        image = request.data.get('Image')
+        if request.user:
+            if posted_by is None or keyword is None or is_found is None or is_claimed is None or image is None:
+                 return Response({'error': 'Please provide all the item information'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        item = Item.objects.get(user=user)
+        item.brand_name=brand_name
+        item.keyword=keyword
+        item.is_found=is_found
+        item.is_claimed=is_claimed
+        item.posted_by=user.phone_number
+        item.Image=image
+        if is_found is True:
+            item.is_claimed = False
+            item.save()
+        else:
+            item.save()
+        user_data = {
+            'msg': 'Item Added successfuly',
+            'item': {
+                'userid': user.id,
+                'emailid': user.email,
+                'firstname': user.first_name,
+                'phonenumber': user.phone_number,
+                'state': user.state,
+                'district': user.district
+            }
+        }
+
 

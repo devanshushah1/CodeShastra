@@ -63,6 +63,7 @@ class Item(models.Model):
     is_claimed = models.BooleanField(default=True)
     posted_by = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     Image = models.ImageField(null=True, blank=True)
+    date_posted = models.DateField(auto_now_add=True)
     def __str__(self):
        return self.brand_name
 
