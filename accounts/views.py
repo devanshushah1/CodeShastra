@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+import django_filters.rest_framework
 from .models import *
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
@@ -13,11 +14,15 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
 import nltk
+from nltk.tag import pos_tag
 from nltk.corpus import wordnet
 from PyDictionary import PyDictionary
 
 # Create your views here.
-f_url = 'http//localhost:3000/'
+f_url = 'http://localhost:3000/'
+
+# nltk.download('wordnet')
+# nltk.download('averaged_perceptron_tagger')
 
 
 def EmailVerification(user):
@@ -51,7 +56,7 @@ class RegisterView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
             user = CustomUser.objects.filter(email=email).exists()
             if user:
-                return Response({'failed': 'account with this email already exists.'})
+                return Response({'msg': 'account with this email already exists.'})
             user = CustomUser.objects.create_user(email=email, password=password)
             user.save()
             if not user:
@@ -116,7 +121,17 @@ def get_tokens_for_user(user):
 class ItemViewSet(viewsets.ModelViewSet):
     model = Item
     serializer_class = ItemSerializer
-    queryset = Item.objects.all()
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filterset_fields = ('category', 'state', 'district')
+
+    def get_queryset(self, *args, **kwargs):
+        if "keywords" in self.kwargs:
+            keywords = self.request.query_params.get('keywords')
+            keywords = keywords.split(',')
+            print(keywords)
+            return Item.objects.all()
+        else:
+            return Item.objects.all()
 
     def create(self, request, *args, **kwargs):
         item_name = request.data.get('item_name')
@@ -127,6 +142,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         # image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
+        # keyword = keyword.lower()
         user = request.user
         print(user)
         item = Item()
@@ -147,9 +163,13 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
         kw_ids = []
-
-        keywords = keyword.split(" ")
-        for kw in keywords:                
+        # keywords = keyword.split(" ")
+        is_noun = lambda pos: pos[:2] == 'NN'
+        is_adj = lambda pos: pos[:2] == 'JJ'
+        tokenized = nltk.word_tokenize(description)
+        nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if is_noun(pos)]
+        adjs = [word for (word, pos) in nltk.pos_tag(tokenized) if is_adj(pos)]
+        for kw in nouns:
             obj, created = Keywords.objects.get_or_create(name=kw)
             print(created)
             # s = wordnet.synsets(kw)
@@ -164,7 +184,21 @@ class ItemViewSet(viewsets.ModelViewSet):
                     print(a)
                     objx, created = Keywords.objects.get_or_create(name=a.lower())
                     kw_ids.append(objx.id)
-        
+        for kw in adjs:
+            obj, created = Keywords.objects.get_or_create(name=kw)
+            print(created)
+            # s = wordnet.synsets(kw)
+            kw_ids.append(obj.id)
+            s = PyDictionary()
+            syn = s.synonym(kw.lower())
+            print("syn", syn)
+            print(0)
+            if created:
+                for a in syn[:20]:
+                    print(1)
+                    print(a)
+                    objx, created = Keywords.objects.get_or_create(name=a.lower())
+                    kw_ids.append(objx.id)
         for obj in kw_ids:
             item.keyword.add(obj)
         
