@@ -63,7 +63,7 @@ class Item(models.Model):
         ('ACCESSORIES', 'ACCESSORIES'),
     )
     item_name = models.CharField(max_length=500, null=True, blank=True)
-    category = models.CharField(max_length=50, choices=choices, default='ACCESSORIES')
+    category = models.CharField(max_length=50, choices=choices, default='ACCESSORIES', null=True, blank=True)
     brand_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     keyword = models.ManyToManyField(Keywords)
@@ -74,6 +74,7 @@ class Item(models.Model):
     date_posted = models.DateField(auto_now_add=True)
     state = models.CharField(max_length=255, null=True, blank=True)
     district = models.CharField(max_length=255, null=True, blank=True)
+    postcode = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
        return self.brand_name

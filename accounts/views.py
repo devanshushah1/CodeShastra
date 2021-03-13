@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+import django_filters.rest_framework
 from .models import *
 from rest_framework import status, viewsets
 from rest_framework.views import APIView
@@ -13,11 +14,15 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
 import nltk
+from nltk.tag import pos_tag
 from nltk.corpus import wordnet
 from PyDictionary import PyDictionary
 nltk.download('wordnet')
 # Create your views here.
-f_url = 'http//localhost:3000/'
+f_url = 'http://localhost:3000/'
+
+# nltk.download('wordnet')
+# nltk.download('averaged_perceptron_tagger')
 
 
 def EmailVerification(user):
@@ -51,7 +56,7 @@ class RegisterView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
             user = CustomUser.objects.filter(email=email).exists()
             if user:
-                return Response({'failed': 'account with this email already exists.'})
+                return Response({'msg': 'account with this email already exists.'})
             user = CustomUser.objects.create_user(email=email, password=password)
             user.save()
             if not user:
@@ -116,7 +121,17 @@ def get_tokens_for_user(user):
 class ItemViewSet(viewsets.ModelViewSet):
     model = Item
     serializer_class = ItemSerializer
-    queryset = Item.objects.all()
+    filter_backends = (django_filters.rest_framework.DjangoFilterBackend,)
+    filterset_fields = ('category', 'state', 'district')
+
+    def get_queryset(self, *args, **kwargs):
+        if "keywords" in self.kwargs:
+            keywords = self.request.query_params.get('keywords')
+            keywords = keywords.split(',')
+            print(keywords)
+            return Item.objects.all()
+        else:
+            return Item.objects.all()
 
     def create(self, request, *args, **kwargs):
         item_name = request.data.get('item_name')
