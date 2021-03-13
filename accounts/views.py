@@ -15,7 +15,7 @@ from .serializers import *
 import nltk
 from nltk.corpus import wordnet
 from PyDictionary import PyDictionary
-
+nltk.download('wordnet')
 # Create your views here.
 f_url = 'http//localhost:3000/'
 
