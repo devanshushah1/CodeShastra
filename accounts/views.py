@@ -127,7 +127,6 @@ class ItemViewSet(viewsets.ModelViewSet):
         # image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
-        keyword = keyword.lower()
         user = request.user
         print(user)
         item = Item()
