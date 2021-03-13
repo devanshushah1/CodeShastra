@@ -224,14 +224,21 @@ class ClaimView(viewsets.ModelViewSet):
         item = request.data['item']
         item = Item.objects.get(id=item)
         ClaimNotification(user, item)
-        response= super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
         instance = response.data
         return Response(instance, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         response = super().update(request, *args, **kwargs)
         instance = response.data
+        if instance['is_accepted'] is True:
+            user = request.user
+            if user:
+                user.reward+=100
+                user.save()
         return Response(instance, status=status.HTTP_200_OK)
+
+
 
 
 
