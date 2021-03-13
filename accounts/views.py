@@ -14,7 +14,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
 import nltk
 from nltk.corpus import wordnet
-nltk.download('wordnet')
 from PyDictionary import PyDictionary
 
 # Create your views here.
@@ -155,13 +154,19 @@ class ItemViewSet(viewsets.ModelViewSet):
         for kw in keywords:
                 
             obj, created = Keywords.objects.get_or_create(name=kw)
+            print(created)
             # s = wordnet.synsets(kw)
             kw_ids.append(obj.id)
             s = PyDictionary()
             syn = s.synonym(kw.lower())
-            for a in s[:10]:
-                objx, created = Keywords.objects.get_or_create(name=a.lower())
-                kw_ids.append(objx.id)
+            print("syn", syn)
+            print(0)
+            if created:
+                for a in syn[:20]:
+                    print(1)
+                    print(a)
+                    objx, created = Keywords.objects.get_or_create(name=a.lower())
+                    kw_ids.append(objx.id)
         
         for obj in kw_ids:
             item.keyword.add(obj)
