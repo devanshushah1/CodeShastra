@@ -64,7 +64,7 @@ class RegisterView(APIView):
             user.district = district
             user.save()
             user_data = {
-                'msg': 'User created successfuly',
+                'msg': 'Account created successfully. Please verify your email by clicking on the link sent to your email address.',
                 'user': {
                     'userid': user.id,
                     # 'username': user.username,
@@ -123,7 +123,6 @@ class ItemViewSet(viewsets.ModelViewSet):
         brand_name = request.data.get('brand_name')
         category = request.data.get('category')
         description = request.data.get('description')
-        keyword = request.data.get('keywords')
         is_found = request.data.get('is_found')
         # image = request.data.get('Image')
         state = request.data.get('state')
@@ -151,8 +150,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         kw_ids = []
 
         keywords = keyword.split(" ")
-        for kw in keywords:
-                
+        for kw in keywords:                
             obj, created = Keywords.objects.get_or_create(name=kw)
             print(created)
             # s = wordnet.synsets(kw)
