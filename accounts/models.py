@@ -57,8 +57,15 @@ class Keywords(models.Model):
        return self.name
 
 class Item(models.Model):
-    item_category = models.CharField(max_length=500, null=True, blank=True)
+    choices = (
+        ('ELECTRONICS', 'ELECTRONICS'),
+        ('PETS/ANIMALS', 'PETS/ANIMALS'),
+        ('ACCESSORIES', 'ACCESSORIES'),
+    )
+    item_name = models.CharField(max_length=500, null=True, blank=True)
+    category = models.CharField(max_length=50, choices=choices, default='ACCESSORIES')
     brand_name = models.CharField(max_length=100, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     keyword = models.ManyToManyField(Keywords)
     is_found = models.BooleanField(default=True)
     is_claimed = models.BooleanField(default=False)
@@ -74,6 +81,7 @@ class Item(models.Model):
 class Claims(models.Model):
     user = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     item = models.ForeignKey(Item, null=True, on_delete=models.SET_NULL)
+    Image = models.ImageField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     location_description = models.TextField(null=True, blank=True)
     is_accepted = models.BooleanField(default=False)

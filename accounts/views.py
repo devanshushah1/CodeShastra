@@ -119,27 +119,31 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
 
     def create(self, request, *args, **kwargs):
+        item_name = request.data.get('item_name')
         brand_name = request.data.get('brand_name')
-        keyword = request.data.get('keywordss')
+        category = request.data.get('category')
+        description = request.data.get('description')
+        keyword = request.data.get('keywords')
         is_found = request.data.get('is_found')
         # image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
-        item_category = request.data.get('item_category')
         keyword = keyword.lower()
         user = request.user
         print(user)
         item = Item()
-        item.brand_name=brand_name
+        item.item_name = item_name
+        item.brand_name = brand_name
+        item.description = description
         print(is_found)
-        item.is_found=is_found
+        item.is_found = is_found
         print(1)
         item.posted_by=user
         print(2)
         # item.Image=image
         item.state=state
         item.district=district
-        item.item_category=item_category
+        item.category=category
 
         item.save()
 
@@ -168,4 +172,3 @@ class ItemViewSet(viewsets.ModelViewSet):
             item.keyword.add(obj)
         
         return Response({'success':'Created Successfully'}, status=status.HTTP_201_CREATED)
-            
