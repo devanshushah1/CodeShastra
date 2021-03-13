@@ -41,7 +41,7 @@ class CustomUser(AbstractUser):
     district = models.CharField(max_length=255, null=True, blank=True)
     email_verified_hash = models.CharField(max_length=255, null=True, blank=True)
     email_verified = models.IntegerField(default=0, null=True, blank=True)
-
+    reward = models.IntegerField(default=0, null=True, blank=True)
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []

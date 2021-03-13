@@ -124,36 +124,59 @@ class ItemViewSet(viewsets.ModelViewSet):
     filterset_fields = ('category', 'state', 'district')
 
     def get_queryset(self, *args, **kwargs):
-        if "keywords" in self.kwargs:
+        print(self.request.query_params)
+        if "keywords" in self.request.query_params:
             keywords = self.request.query_params.get('keywords')
+            print(123)
             keywords = keywords.split(',')
             print(keywords)
-            return Item.objects.all()
+            exists = []
+            for i in keywords:
+                a = Keywords.objects.filter(name=i)
+                if a.exists():  
+                    exists.append(a)
+            print(exists)
+
+            item_list = []
+            for x in Item.objects.all():
+                count = 0
+                for y in exists:
+                    for z in y:
+                        if z in x.keyword.all():
+                                count+=1;
+                        if len(keywords)>2:
+                            if count>=2:
+                                item_list.append(x.id)
+                        else:
+                            item_list.append(x.id)
+            print(item_list)
+
+            queryset = Item.objects.filter(id__in=item_list)
+                        
+            # print(keywords)
+            return queryset
         else:
+            print(123)
             return Item.objects.all()
 
     def create(self, request, *args, **kwargs):
-        item_name = request.data.get('item_name')
-        brand_name = request.data.get('brand_name')
-        category = request.data.get('category')
+        item_name = request.data.get('item_name', None)
+        brand_name = request.data.get('brand_name', None)
+        category = request.data.get('category', None)
         description = request.data.get('description')
         is_found = request.data.get('is_found')
-        # image = request.data.get('Image')
+        image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
         # keyword = keyword.lower()
         user = request.user
-        print(user)
         item = Item()
         item.item_name = item_name
         item.brand_name = brand_name
         item.description = description
-        print(is_found)
         item.is_found = is_found
-        print(1)
         item.posted_by=user
-        print(2)
-        # item.Image=image
+        item.Image=image
         item.state=state
         item.district=district
         item.category=category
@@ -170,32 +193,23 @@ class ItemViewSet(viewsets.ModelViewSet):
         adjs = [word for (word, pos) in nltk.pos_tag(tokenized) if is_adj(pos)]
         for kw in nouns:
             obj, created = Keywords.objects.get_or_create(name=kw)
-            print(created)
             # s = wordnet.synsets(kw)
             kw_ids.append(obj.id)
             s = PyDictionary()
             syn = s.synonym(kw.lower())
-            print("syn", syn)
-            print(0)
             if created:
                 for a in syn[:20]:
-                    print(1)
-                    print(a)
                     objx, created = Keywords.objects.get_or_create(name=a.lower())
                     kw_ids.append(objx.id)
         for kw in adjs:
             obj, created = Keywords.objects.get_or_create(name=kw)
-            print(created)
             # s = wordnet.synsets(kw)
             kw_ids.append(obj.id)
             s = PyDictionary()
             syn = s.synonym(kw.lower())
-            print("syn", syn)
-            print(0)
+
             if created:
                 for a in syn[:20]:
-                    print(1)
-                    print(a)
                     objx, created = Keywords.objects.get_or_create(name=a.lower())
                     kw_ids.append(objx.id)
         for obj in kw_ids:
@@ -224,7 +238,7 @@ class ClaimView(viewsets.ModelViewSet):
         item = request.data['item']
         item = Item.objects.get(id=item)
         ClaimNotification(user, item)
-        response= super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
         instance = response.data
         return Response(instance, status=status.HTTP_201_CREATED)
 
@@ -232,7 +246,14 @@ class ClaimView(viewsets.ModelViewSet):
         response = super().update(request, *args, **kwargs)
         instance = response.data
         print(instance)
+        if instance['is_accepted'] is True:
+            user = request.user
+            if user:
+                user.reward+=100
+                user.save()
         return Response(instance, status=status.HTTP_200_OK)
+
+
 
 
 
