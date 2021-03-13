@@ -12,24 +12,29 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
+
 # Create your views here.
 f_url = 'http//localhost:3000/'
 
+
 def EmailVerification(user):
-    token  = get_random_string(length=32)
+    token = get_random_string(length=32)
     user.email_verified_hash = token
     user.save()
     verify_link = f_url + 'login/?token=' + token
     subject = 'Verify your email.'
     to = user.email
     html_content = render_to_string('accounts/EmailVerification.html', {
-        'verify_link':verify_link,
+        'verify_link': verify_link,
     })
-    send_mail(subject=subject, from_email='djangonotforme@gmail.com', message='abcd', recipient_list=[to], html_message=html_content)
-    
+    send_mail(subject=subject, from_email='djangonotforme@gmail.com', message='abcd', recipient_list=[to],
+              html_message=html_content)
+
+
 class RegisterView(APIView):
     serializer_class = RegisterSerializer
-    def post(self,request):
+
+    def post(self, request):
         # username = request.data.get("username")
         password = request.data.get("password")
         email = request.data.get("emailid")
@@ -43,7 +48,7 @@ class RegisterView(APIView):
                                 status=status.HTTP_400_BAD_REQUEST)
             user = CustomUser.objects.filter(email=email).exists()
             if user:
-                return Response({'failed':'account with this email already exists.'})
+                return Response({'failed': 'account with this email already exists.'})
             user = CustomUser.objects.create_user(email=email, password=password)
             user.save()
             if not user:
@@ -51,9 +56,9 @@ class RegisterView(APIView):
                                 status=status.HTTP_404_NOT_FOUND)
             user.email = email
             user.first_name = firstname
-            user.phone_number= phonenumber
-            user.state=state
-            user.district=district
+            user.phone_number = phonenumber
+            user.state = state
+            user.district = district
             user.save()
             user_data = {
                 'msg': 'User created successfuly',
@@ -72,13 +77,14 @@ class RegisterView(APIView):
         else:
             return Response({'error': 'You are not authorized'},
                             status=status.HTTP_400_BAD_REQUEST)
-                        
+
+
 class EmailVerify(APIView):
     def post(self, request):
         token = request.data['token']
         res = {
-            'status':'success',
-            'message':'Valid'
+            'status': 'success',
+            'message': 'Valid'
         }
 
         if CustomUser.objects.filter(email_verified_hash=token, email_verified=0).exists():
@@ -91,8 +97,9 @@ class EmailVerify(APIView):
                 'status': 'failed',
                 'message': 'Invalid',
             }
-        
-        return Response(res) 
+
+        return Response(res)
+
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
@@ -101,10 +108,10 @@ def get_tokens_for_user(user):
         'access': str(refresh.access_token),
     }
 
+
 class ItemViewSet(viewsets.ModelViewSet):
     model = Item
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
 
     # def create(self, request):
-        
