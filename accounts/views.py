@@ -12,6 +12,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import *
+import nltk
+from nltk.corpus import wordnet
+nltk.download('wordnet')
 
 # Create your views here.
 f_url = 'http//localhost:3000/'
@@ -109,9 +112,52 @@ def get_tokens_for_user(user):
     }
 
 
+
 class ItemViewSet(viewsets.ModelViewSet):
     model = Item
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
 
-    # def create(self, request):
+    def create(self, request, *args, **kwargs):
+        brand_name = request.data.get('brand_name')
+        keyword = request.data.get('keywordss')
+        is_found = request.data.get('is_found')
+        # image = request.data.get('Image')
+        state = request.data.get('state')
+        district = request.data.get('district')
+        item_category = request.data.get('item_category')
+        keyword = keyword.lower()
+        user = request.user
+        print(user)
+        item = Item()
+        item.brand_name=brand_name
+        print(is_found)
+        item.is_found=is_found
+        print(1)
+        item.posted_by=user
+        print(2)
+        # item.Image=image
+        item.state=state
+        item.district=district
+        item.item_category=item_category
+
+        item.save()
+
+
+        kw_ids = []
+
+        keywords = keyword.split(" ")
+        for kw in keywords:
+                
+            obj, created = Keywords.objects.get_or_create(name=kw)
+            s = wordnet.synsets(kw)
+            kw_ids.append(obj.id)
+            for a in s[:5]:
+                objx, created = Keywords.objects.get_or_create(name=a.lemmas()[0].name().lower())
+                kw_ids.append(objx.id)
+        
+        for obj in kw_ids:
+            item.keyword.add(obj)
+        
+        return Response({'success':'Created Successfully'}, status=status.HTTP_201_CREATED)
+            

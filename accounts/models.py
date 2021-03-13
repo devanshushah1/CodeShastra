@@ -61,7 +61,7 @@ class Item(models.Model):
     brand_name = models.CharField(max_length=100, null=True, blank=True)
     keyword = models.ManyToManyField(Keywords)
     is_found = models.BooleanField(default=True)
-    is_claimed = models.BooleanField(default=True)
+    is_claimed = models.BooleanField(default=False)
     posted_by = models.ForeignKey(CustomUser, null=True, on_delete=models.SET_NULL)
     Image = models.ImageField(null=True, blank=True)
     date_posted = models.DateField(auto_now_add=True)
