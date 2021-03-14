@@ -164,10 +164,17 @@ class ItemViewSet(viewsets.ModelViewSet):
         item_name = request.data.get('item_name', None)
         brand_name = request.data.get('brand_name', None)
         category = request.data.get('category', None)
+        if category=='Electronics':
+            category = 'ELECTRONICS'
+        elif category=='Pets':
+            category = 'PETS/ANIMALS'
+        elif category=='Accessories':
+            category = 'ACCESSORIES'
         description = request.data.get('description')
         image = request.data.get('Image')
         state = request.data.get('state')
         district = request.data.get('district')
+        postcode = request.data.get('postcode')
         # keyword = keyword.lower()
         user = request.user
         item = Item()
@@ -179,6 +186,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         item.state=state
         item.district=district
         item.category=category
+        item.postcode = postcode
 
         item.save()
 
@@ -188,6 +196,7 @@ class ItemViewSet(viewsets.ModelViewSet):
         is_noun = lambda pos: pos[:2] == 'NN'
         is_adj = lambda pos: pos[:2] == 'JJ'
         tokenized = nltk.word_tokenize(description)
+        print(1)
         nouns = [word for (word, pos) in nltk.pos_tag(tokenized) if is_noun(pos)]
         adjs = [word for (word, pos) in nltk.pos_tag(tokenized) if is_adj(pos)]
         for kw in nouns:
@@ -196,25 +205,29 @@ class ItemViewSet(viewsets.ModelViewSet):
             kw_ids.append(obj.id)
             s = PyDictionary()
             syn = s.synonym(kw.lower())
-            if created:
-                for a in syn[:20]:
-                    objx, created = Keywords.objects.get_or_create(name=a.lower())
-                    kw_ids.append(objx.id)
+            print('syn1', syn)
+            for a in syn[:20]:
+                objx, created = Keywords.objects.get_or_create(name=a.lower())
+                print(objx)
+                kw_ids.append(objx.id)
         for kw in adjs:
             obj, created = Keywords.objects.get_or_create(name=kw)
             # s = wordnet.synsets(kw)
             kw_ids.append(obj.id)
             s = PyDictionary()
             syn = s.synonym(kw.lower())
+            print('syn2', syn)
 
-            if created:
-                for a in syn[:20]:
-                    objx, created = Keywords.objects.get_or_create(name=a.lower())
-                    kw_ids.append(objx.id)
+            for a in syn[:20]:
+                objx, created = Keywords.objects.get_or_create(name=a.lower())
+                kw_ids.append(objx.id)
+        print(kw_ids)
         for obj in kw_ids:
             item.keyword.add(obj)
         
         return Response({'success':'Created Successfully'}, status=status.HTTP_201_CREATED)
+
+
 
 def ClaimNotification(user, item):
     subject = 'Claim for item'
@@ -251,8 +264,6 @@ class ClaimView(viewsets.ModelViewSet):
                 user.reward+=100
                 user.save()
         return Response(instance, status=status.HTTP_200_OK)
-
-
 
 
 
