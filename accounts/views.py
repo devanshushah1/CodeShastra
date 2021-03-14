@@ -20,8 +20,9 @@ from PyDictionary import PyDictionary
 # Create your views here.
 f_url = 'http://localhost:3000/'
 
-# nltk.download('wordnet')
-# nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 
 
 def EmailVerification(user):
